@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>2D Improved Perlin Noise</title>
+		<link rel="stylesheet" type="text/css" href="style.css" />
+	</head>
+	<body>
+		<canvas width="500" height="500"></canvas>
+		<script src="util.js"></script>
+		<script src="noise.js"></script>
+		<script>
+			var ctx       = document.getElementsByTagName("canvas")[0].getContext("2d"),
+				imageData = ctx.createImageData(500, 500),
+				data      = imageData.data;
+			
+			for(var y = 0; y < 500; y++){
+				for(var x = 0; x < 500; x++){
+					var n = 0.0;
+					var ampl = 1.0,
+						freq = 0.005;
+					for(var o = 0; o < 8; o++){
+						n += ampl*Noise.noise2D(x*freq, y*freq);
+						
+						ampl *= 0.5;
+						freq *= 2.0;
+					}
+					n += 1.0;
+					n *= 0.5;
+					
+					var c      = Math.round(n*255),
+						index  = (x + 500*y) * 4;
+					var colors;
+					if(c < 80) c = 80;   //So that water is not too dark
+					if(c < 150)
+						colors = {r:0, g:0, b:c};
+					else if(c < 220)
+						colors = {r:0, g:c, b:0};
+					else
+						colors = {r:c, g:c, b:c};
+					
+					data[index] = colors.r;
+					data[index+1] = colors.g;
+					data[index+2] = colors.b;
+					data[index+3] = 255;
+				}
+			}
+			
+			ctx.putImageData(imageData, 0, 0);
+		</script>
+	</body>
+</html>

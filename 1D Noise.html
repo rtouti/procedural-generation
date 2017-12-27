@@ -3,7 +3,8 @@
 <html>
 	<head>
 		<meta charset="utf-8" />
-		<title>Procedural generation</title>
+		<title>1D Improved Perlin Noise</title>
+		<link rel="stylesheet" type="text/css" href="style.css" />
 	</head>
 	<body>
 		<canvas width="1000" height="600"></canvas>
@@ -12,7 +13,7 @@
 		<script>
 			var ctx = document.getElementsByTagName("canvas")[0].getContext("2d");
 			
-			ctx.translate(0, 300);
+			//ctx.translate(0, 300);
 			
 			var points1 = [],
 				points2 = [],
@@ -34,7 +35,7 @@
 			var i = 0, j = 0;
 			function loop(){
 				ctx.fillStyle = "white";
-				ctx.fillRect(0, -300, 1000, 600);
+				ctx.fillRect(0, 0, 1000, 600);
 				
 				ctx.strokeStyle = "black";
 				
@@ -42,15 +43,15 @@
 				ctx.beginPath();
 				ctx.moveTo(0, points2[0]*100);
 				for(var p = 1; p < 1000; p++){
-					ctx.lineTo(p, points2[p]*150 - 150);
+					ctx.lineTo(p, points2[p]*150 + 150);
 				}
-				ctx.lineTo(1000, 200);
-				ctx.lineTo(0, 200);
+				ctx.lineTo(1000, 600);
+				ctx.lineTo(0, 600);
 				ctx.fill();
 				ctx.beginPath();
 				ctx.moveTo(0, points2[0]*100);
 				for(var p = 1; p < 1000; p++){
-					ctx.lineTo(p, points2[p]*150 - 150);
+					ctx.lineTo(p, points2[p]*150 + 150);
 				}
 				ctx.stroke();
 				
@@ -58,16 +59,16 @@
 				ctx.beginPath();
 				ctx.moveTo(0, points1[0]*100);
 				for(var p = 1; p < 1000; p++){
-					ctx.lineTo(p, points1[p]*150 + 50);
+					ctx.lineTo(p, points1[p]*150 + 350);
 				}
-				ctx.lineTo(1000, 200);
-				ctx.lineTo(0, 200);
+				ctx.lineTo(1000, 600);
+				ctx.lineTo(0, 600);
 				ctx.fill();
 				ctx.fillStyle = "gray";
 				ctx.beginPath();
 				ctx.moveTo(0, points1[0]*100);
 				for(var p = 1; p < 1000; p++){
-					ctx.lineTo(p, points1[p]*150 + 50);
+					ctx.lineTo(p, points1[p]*150 + 350);
 				}
 				ctx.stroke();
 				

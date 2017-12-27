@@ -16,13 +16,13 @@ Noise.noise1D = function(x){
 Noise.noise2D = function(x, y){
 	var X  = Math.floor(x) & 255,
 		Y  = Math.floor(y) & 255,
-		xf = x-floor(x),
-		yf = y-floor(y),
-		u  = util.fade(xf),
-		v  = util.fade(yf);
+		xf = x-Math.floor(x),
+		yf = y-Math.floor(y),
+		u  = NoiseUtil.fade(xf),
+		v  = NoiseUtil.fade(yf);
 
-	var A = P[X],
-		B = P[X+1],
+	var A = Noise.P[X],
+		B = Noise.P[X+1],
 		AA = A+Y,
 		BB = B+Y;
 	
