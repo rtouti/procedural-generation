@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>GPU Value Noise</title>
+		<link rel="stylesheet" type="text/css" href="../style.css" />
+	</head>
+	<body>
+		<canvas width="1024" height="512"></canvas>
+		<script src="value_noise.js"></script>
+		<script id="vertex_shader" type="shader-x/vertex-shader-x">
+			precision highp float;
+			
+			attribute vec2 pos;
+			
+			void main(){
+				gl_Position = vec4(pos, 0.0, 1.0);
+			}
+		</script>
+		<script id="fragment_shader" type="shader-x/fragment-shader-x">
+			uniform float uOffset;
+			uniform vec2 uSize;
+			
+			float map(float t, float a1, float a2, float b1, float b2){
+				return b1+((t-a1)/(a2-a1))*(b2-b1);
+			}
+			
+			const float PI = 3.14159;
+			
+			void main(){
+				float phi = map(gl_FragCoord.x, uSize.x, 0.0, 0.0, 2.0*PI);
+				float theta = map(gl_FragCoord.y, uSize.y, 0.0, 0.0, PI);
+				float x = 1.0*sin(theta)*cos(phi);
+				float y = 1.0*cos(theta);
+				float z = 1.0*sin(theta)*sin(phi);
+				float n = 0.0;
+				float a = 1.0;
+				//float f = 0.001;	//For normal heightmaps
+				float f = 2.0;		//For spherical heightmaps
+				for(int o = 0; o < 14; o++){
+					//float v = a*noise2d(f*(gl_FragCoord.x+uOffset), f*(gl_FragCoord.y+uOffset));	//For normal heightmaps
+					float v = a*noise3d(f*x+uOffset, f*y, f*z);		//For spherical heightmaps
+					v *= 2.0;
+					v -= 1.0*a;
+					n += v;
+					a *= 0.5;
+					f *= 2.0;
+				}
+				n += 1.0;
+				n *= 0.5;
+				
+				if(n <= 0.5)
+					gl_FragColor = vec4(0.0, 0.0, n, n);
+				else if(n <= 0.85)
+					gl_FragColor = vec4(n*0.2, n, n*0.5, n);
+				else
+					gl_FragColor = vec4(n, n, n, n);
+				
+				//n = map(gl_FragCoord.y, 0.0, uSize.y, 0.0, 1.0);
+				//n = phi/(2.0*PI);
+				//gl_FragColor = vec4(n, n, n, 1.0);
+			}
+		</script>
+		<script>
+			var canvas = document.getElementsByTagName("canvas")[0],
+				gl     = canvas.getContext("webgl");
+			
+			let quad_vertices = [
+				-1.0, -1.0,
+				1.0, -1.0,
+				1.0, 1.0,
+				1.0, 1.0,
+				-1.0, 1.0,
+				-1.0, -1.0
+			];
+			
+			let vs = gl.createShader(gl.VERTEX_SHADER);
+			gl.shaderSource(vs, document.getElementById("vertex_shader").innerHTML);
+			gl.compileShader(vs);
+			console.log(gl.getShaderInfoLog(vs));
+			let fs = gl.createShader(gl.FRAGMENT_SHADER);
+			gl.shaderSource(fs, fragment_shader_src+document.getElementById("fragment_shader").innerHTML);
+			gl.compileShader(fs);
+			console.log(gl.getShaderInfoLog(fs));
+			let program = gl.createProgram();
+			gl.attachShader(program, vs);
+			gl.attachShader(program, fs);
+			gl.linkProgram(program);
+			gl.useProgram(program);
+			
+			let vbo = gl.createBuffer();
+			gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(quad_vertices), gl.STATIC_DRAW);
+			gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+			gl.enableVertexAttribArray(0);
+			
+			let offsetLocation = gl.getUniformLocation(program, "uOffset"),
+				sizeLocation = gl.getUniformLocation(program, "uSize"),
+				offset = Math.random()*1000.0;
+			
+			gl.uniform2f(sizeLocation, canvas.width, canvas.height);
+			
+			//gl.enable(gl.BLEND);
+			//gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+			
+			function loop(){
+				gl.uniform1f(offsetLocation, offset);
+				gl.drawArrays(gl.TRIANGLES, 0, 6);
+				
+				//offset += 0.005;
+				
+				//window.requestAnimationFrame(loop);
+			}
+			
+			window.requestAnimationFrame(loop);
+		</script>
+	</body>
+</html>
