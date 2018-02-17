@@ -11,4 +11,4 @@ A few procedural generation algorithms with examples
 
 Spherical heightmap with value noise:
 
-![Spherical heightmaps with value noise](https://github.com/rtouti/procedural-generation/blob/gh-pages/gpu/examples/heightmap4.png)
+![Spherical heightmap with value noise](https://github.com/rtouti/procedural-generation/blob/gh-pages/gpu/examples/heightmap4.png)
