@@ -4,6 +4,7 @@ class NoiseUtil {
 		return a + t*(b-a);
 	}
 
+	// This returns the dot product between the 1D vector (x) and a 1D unit vector.
 	static Grad1D(h, x){
 		h = h & 1;
 		if(h == 0)
@@ -12,6 +13,7 @@ class NoiseUtil {
 			return -x;
 	}
 
+	// This returns the dot product between the 2D vector (x, y) and a 2D unit vector.
 	static Grad2D(h, x, y){
 		h = h & 3;
 		if(h == 0)
@@ -24,6 +26,7 @@ class NoiseUtil {
 			return x - y;
 	}
 
+	// This returns the dot product between the 3D vector (x, y, z) and a 3D unit vector.
 	static Grad3D(h, x, y, z){
 		h = h & 15;
 		if(h === 0)
@@ -96,10 +99,10 @@ class Noise {
 			xf = x-Math.floor(x),
 			u  = NoiseUtil.Fade(xf);
 		
-		let A = this.P[X],
-			B = this.P[X+1];
+		let gradLeft = this.P[X],
+			gradRight = this.P[X+1];
 
-		return NoiseUtil.Lerp(u, NoiseUtil.Grad1D(A, xf), NoiseUtil.Grad1D(B, xf-1.0))
+		return NoiseUtil.Lerp(u, NoiseUtil.Grad1D(gradLeft, xf), NoiseUtil.Grad1D(gradRight, xf-1.0))
 	}
 
 	static Noise2D(x, y){
@@ -110,15 +113,15 @@ class Noise {
 			u  = NoiseUtil.Fade(xf),
 			v  = NoiseUtil.Fade(yf);
 
-		let A = Noise.P[X],
-			B = Noise.P[X+1],
-			AA = A+Y,
-			BB = B+Y;
+		let gradBottomLeft = Noise.P[Noise.P[X]+Y],
+			gradBottomRight = Noise.P[Noise.P[X+1]+Y],
+			gradTopLeft = Noise.P[Noise.P[X]+Y+1],
+			gradTopRight = Noise.P[Noise.P[X+1]+Y+1];
 		
 		return NoiseUtil.Lerp(
 			u,
-			NoiseUtil.Lerp(v, NoiseUtil.Grad2D(AA, xf, yf), NoiseUtil.Grad2D(AA+1, xf, yf-1.0)),
-			NoiseUtil.Lerp(v, NoiseUtil.Grad2D(BB, xf-1.0, yf), NoiseUtil.Grad2D(BB+1, xf-1.0, yf-1.0))
+			NoiseUtil.Lerp(v, NoiseUtil.Grad2D(gradBottomLeft, xf, yf), NoiseUtil.Grad2D(gradTopLeft, xf, yf-1.0)),
+			NoiseUtil.Lerp(v, NoiseUtil.Grad2D(gradBottomRight, xf-1.0, yf), NoiseUtil.Grad2D(gradTopRight, xf-1.0, yf-1.0))
 		)
 	}
 
